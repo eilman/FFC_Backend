@@ -42,13 +42,21 @@ public class OrderService {
 	}
 
 	public Orders updateOrder(Long orderId, Orders savedRequest) {
+		Long restaurantIdForOrder = (long) 0;
+		List<Restaurants> allRestaurants = restaurantRepository.findAll();
 		Optional<Orders> order = orderRepository.findById(orderId);
 		if(order.isPresent()) {
+			for(Restaurants rest: allRestaurants) {
+				if(rest.getRestaurantName().equals(savedRequest.getRestaurant().getRestaurantName()) ) {
+					restaurantIdForOrder = rest.getRestaurantId();
+				}
+			}
+			Restaurants restaurant = restaurantRepository.findById(restaurantIdForOrder).get();
 			Orders foundOrder = order.get();
 			foundOrder.setDeliveryAddress(savedRequest.getDeliveryAddress());
 			foundOrder.setPhone(savedRequest.getPhone());
 			foundOrder.setProductName(savedRequest.getProductName());
-			foundOrder.getRestaurant().setRestaurantId(savedRequest.getRestaurant().getRestaurantId());
+			foundOrder.setRestaurant(restaurant);
 			foundOrder.setStatus(savedRequest.getStatus());
 			foundOrder.getUser().setUserId(savedRequest.getUser().getUserId());
 			orderRepository.save(foundOrder);
