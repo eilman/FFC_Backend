@@ -45,10 +45,17 @@ public class RestaurantService {
 	public Restaurants updateRestaurant(Long restaurantId, Restaurants savedRequest) {
 		Optional<Restaurants> restaurant = restaurantRepository.findById(restaurantId);
 		if(restaurant.isPresent()) {
+			Long restManagerId = (long) 0;
+			List<Users> allUsers = userRepository.findAll();
+			for(Users user: allUsers) {
+				if(user.getUsername().equals(savedRequest.getUser().getUsername()) ) {
+					restManagerId = user.getUserId();
+				}
+			}
+			Users user = userRepository.findById(restManagerId).get();
 			Restaurants foundRest = restaurant.get();
 			foundRest.setRestaurantAddress(savedRequest.getRestaurantAddress());
-			//??
-			foundRest.getUser().setUserId(savedRequest.getUser().getUserId());
+			foundRest.setUser(user);
 			foundRest.setRestaurantName(savedRequest.getRestaurantName());
 			restaurantRepository.save(foundRest);
 			return foundRest;
